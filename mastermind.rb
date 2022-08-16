@@ -2,67 +2,83 @@
 #no duplicate colors (in guess or solution)
 #no blank colors
 
+class Guess
+  #gets a guess from the user
+  attr_reader :length, :guess
+  private
+  def initialize
+    @length = 4
+    @guess = get_guess
+  end
 
-#get user's guess
-def get_user_guess
-  guess = []
-  4.times do
-    #one color at a time
-    color = gets
-    #process user input
-    color = color.chomp.to_sym
-    #store each color
-    guess.push(color)
+  def get_color
+    begin
+      puts "enter a color: "
+      input = gets
+      color = input.chomp.to_sym
+    rescue
+      puts "bad input, try again"
+    end
+  end
+  
+  def get_guess
+    puts "Input a guess (4 inputs, 1 per color):"
+    guess = []
+    while guess.length < length
+      color = get_color
+      guess.push(color) if color
+    end
     guess
   end
 end
-#compare guess to solution
-#is it correct?
-# if solution == guess
-#   puts "you win"
-# end
 
-class Indexed_colors
-  attr_reader :guess, :solution, :colors_per
-  def initialize
-    @guess = [:green, :blue, :yellow, :red]
-    @solution = [:green, :blue, :red, :yellow]
-    @colors_per = 4
+class Feedback
+  #provides feedback for a user's guess
+  private
+  attr_reader :guess, :solution
+  @@solution = [:green, :blue, :red, :yellow]
+  def initialize(guess)
+    @guess = guess
   end
 
-  def is_position_correct?(position)
-    solution[position] == guess[position] ? true : false
+  Color_pair = Struct.new(:guess, :solution) do
+    def same?
+      guess == solution
+    end
   end
   
-  def count_correct_positions
-    #trusts that solution and index have @colors_per items.
-
-    #check how many indexes have the same color in them
-    correct_positions = 0
-    for position in colors_per.times
-      if is_position_correct?(position)
-        correct_positions += 1
-      end
-    end
-    correct_positions
+  def create_color_pair(index)
+    #creates a pair of colors from guess,solution at
+    #the same position.
+    Color_pair.new(guess[index], self.solution[index]) 
   end
 
-    
+  def color_pairs
+    #returns an iterable with all color pairs
+    #(trusts that guess and self.solution have the same length)
+    Array.new(self.solution.length)
+      .map
+      .with_index {|redundant,i| create_color_pair(i)}
+  end
+  
+  public
+  def count_correct_positions
+    #how many colors are correct + at the correct position?
+    color_pairs
+      .select{|pair| pair.same?}
+      .count
+  end
 
-
-  def count_wrong_positions
-    correct_colors = guess.intersection(solution).count
-    correct_positions = self.count_correct_positions
-    if correct_colors > correct_positions
-      correct_colors - correct_positions
-    else
-      correct_positions - correct_colors
-    end
+  def count_correct_colors
+    guess.intersection(self.solution).count
+  end
+  
+  def count_correct_colors_at_wrong_positions
+    (count_correct_colors - count_correct_positions).abs
   end  
 end
 
-pair = Indexed_colors.new
-p pair.count_wrong_positions
-p pair.count_correct_positions
+
+p Feedback.new(Guess.new.guess)
 
 
