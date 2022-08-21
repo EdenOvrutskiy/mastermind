@@ -79,33 +79,6 @@ class Feedback
 end
 
 
-#new class/method to take lower-level responsibilities away
-#from Feedback.
-
-#compare two arrays, find out:
-#unique instances of members that appear in both
-
-array1 = [1, 2, 3]
-array2 = [2, 1, 3]
-#expecting: 1,2,3 in common, 3 in same spot
-#
-
-def does_number_show_up_in_array(num, array)
-  array.include?(num)
-end
-
-def find_shared_members_without_duplicates(array1, array2)
-  array1 & array2
-end
-
-def find_indexes_with_same_content(array1, array2)
-  array1
-    .each_index
-    .select{|i| array1[i] == array2[i]}
-end
-
-p find_shared_members_without_duplicates(array1, array2)
-p find_indexes_with_same_content(array1, array2)
 
 #Feedback.new([:green, :blue, :yellow, :red]).count_correct_positions
 
