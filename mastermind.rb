@@ -15,7 +15,8 @@ class Guess
   end
 
   def valid_input?(input)
-    input.is_a?(String) && input.length == 4 && is_number(input)
+    input.is_a?(String) && input.length == length &&
+      is_number(input)
   end
   
   def is_number(string)
@@ -36,21 +37,6 @@ class Guess
     puts "enter a guess (e.g '1234')"
   end
   
-  def get_guess
-    display_digit_to_color_mapping
-    prompt_for_guess
-    input = gets
-    number_string = input.chomp
-    if valid_input?(number_string)
-      digits_strings = number_string.split('')
-      digits = digits_strings.map(&:to_i)
-      colors = digits.map{|digit| digit_to_color(digit)}
-    else
-      puts "bad input, try again"
-      get_guess
-    end
-  end
-
   def digit_to_color(digit)
     case digit
     when 1 then :blue
@@ -61,6 +47,38 @@ class Guess
     when 6 then :purple
     else
       nil
+    end
+  end
+
+  def strings_to_digits(strings)
+    #['1', '2', '3'] -> [1, 2, 3]
+    #expects array
+    digits = strings.map(&:to_i)
+  end
+
+  def digits_to_colors(digits)
+    #[1, 2, 3] -> [:blue, :red, :yellow]
+    colors = digits.map{|digit| digit_to_color(digit)}
+    
+  end
+
+  def string_to_colors(string)
+    # "1234" -> [:blue, :red, :yellow, :orange]
+    strings = string.split('')
+    digits = strings_to_digits(strings)
+    colors = digits_to_colors(digits)
+  end
+
+  def get_guess
+    display_digit_to_color_mapping
+    prompt_for_guess
+    input = gets
+    number_string = input.chomp
+    if valid_input?(number_string)
+      colors = string_to_colors(number_string)
+    else
+      puts "bad input, try again"
+      get_guess
     end
   end
 end
