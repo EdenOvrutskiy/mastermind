@@ -4,6 +4,9 @@
 
 class Guess
   #gets a guess from the user
+  public
+  attr_reader :guess
+  
   private
   attr_reader :length
   def initialize
@@ -11,31 +14,45 @@ class Guess
     @guess = get_guess
   end
 
-  def get_color
-    begin
-      def prompt_for_color
-        puts "select a color by entering its' corresponding digit:"
-        puts "1 -> blue"
-        puts "2 -> red"
-        puts "3 -> yellow"
-        puts "4 -> orange"
-        puts "5 -> green"
-        puts "6 -> purple"
-        puts "enter a digit: "
-      end
-      prompt_for_color
-      input = gets
-      digit = input.chomp.to_i
-      color = number_to_color(digit)
-      puts "you have selected: #{color}"
-      color
-    rescue
+  def valid_input?(input)
+    input.is_a?(String) && input.length == 4 && is_number(input)
+  end
+  
+  def is_number(string)
+    string == string.to_i.to_s
+  end
+
+  def display_digit_to_color_mapping
+    puts "each digit corresponds to a color:"
+    puts "1 -> blue"
+    puts "2 -> red"
+    puts "3 -> yellow"
+    puts "4 -> orange"
+    puts "5 -> green"
+    puts "6 -> purple"
+  end
+  
+  def prompt_for_guess
+    puts "enter a guess (e.g '1234')"
+  end
+  
+  def get_guess
+    display_digit_to_color_mapping
+    prompt_for_guess
+    input = gets
+    number_string = input.chomp
+    if valid_input?(number_string)
+      digits_strings = number_string.split('')
+      digits = digits_strings.map(&:to_i)
+      colors = digits.map{|digit| digit_to_color(digit)}
+    else
       puts "bad input, try again"
+      get_guess
     end
   end
 
-  def number_to_color(number)
-    case number
+  def digit_to_color(digit)
+    case digit
     when 1 then :blue
     when 2 then :red
     when 3 then :yellow
@@ -45,18 +62,6 @@ class Guess
     else
       nil
     end
-  end
-
-  public
-  attr_reader :guess
-  def get_guess
-    puts "Input a guess (4 inputs, 1 per color):"
-    guess = []
-    while guess.length < length
-      color = get_color
-      guess.push(color) if color
-    end
-    guess
   end
 end
 
