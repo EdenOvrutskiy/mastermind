@@ -8,15 +8,17 @@ class Guess
   attr_reader :guess
   
   private
-  attr_reader :length
+  attr_reader :length, :input
   def initialize
     @length = 4
     @guess = get_guess
   end
 
-  def valid_input?(input)
-    input.is_a?(String) && input.length == length &&
-      is_number(input)
+  def valid_input?
+    chomped_input = input.chomp
+    chomped_input.is_a?(String) &&
+      chomped_input.length == length &&
+      is_number(chomped_input)
   end
   
   def is_number(string)
@@ -62,28 +64,29 @@ class Guess
     
   end
 
-  def string_to_colors(string)
+  def input_into_guess
     # "1234" -> [:blue, :red, :yellow, :orange]
-    strings = string.split('')
+    strings = input.split('')
     digits = strings_to_digits(strings)
     colors = digits_to_colors(digits)
+  end
+
+  def get_valid_input
+    #repeatedly asks for input until it's valid
+    while true
+      @input = gets
+      break if valid_input?
+      puts "bad input, try again"
+    end
   end
 
   def get_guess
     display_digit_to_color_mapping
     prompt_for_guess
-    input = gets
-    number_string = input.chomp
-    if valid_input?(number_string)
-      colors = string_to_colors(number_string)
-    else
-      puts "bad input, try again"
-      get_guess
-    end
+    get_valid_input
+    input_into_guess
   end
 end
-
-
 
 class Feedback
   #provides feedback for a user's guess
